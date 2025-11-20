@@ -1,5 +1,7 @@
 /output
-/examples
+/books
 /temp_epub
 *.epub
 *.ipynb
+*.txt
+*.backup
