@@ -1,7 +1,10 @@
 /output
 /books
 /temp_epub
+/test
 *.epub
 *.ipynb
 *.txt
 *.backup
+/.claude
+CLAUDE.md
