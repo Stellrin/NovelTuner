@@ -192,6 +192,7 @@ Examples:
   %(prog)s input.txt -o output.txt      # Convert to specified file
   %(prog)s input_dir/ -r                # Recursively convert all txt files in directory
   %(prog)s input_dir/ -o output_dir/    # Convert directory to specified output directory
+  %(prog)s input.txt -b                 # Convert with backup
         """
     )
 
@@ -199,8 +200,8 @@ Examples:
     parser.add_argument('-o', '--output', help='Output file or directory path')
     parser.add_argument('-r', '--recursive', action='store_true',
                        help='Recursively process subdirectories (valid for directory input only)')
-    parser.add_argument('--no-backup', action='store_true',
-                       help='Do not create backup files (valid for file overwrite mode only)')
+    parser.add_argument('-b', '--backup', action='store_true',
+                       help='Create backup files (valid for file overwrite mode only)')
     parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 
     args = parser.parse_args()
@@ -209,13 +210,13 @@ Examples:
 
     if input_path.is_file():
         # Process single file
-        success = process_file(args.input, args.output, backup=not args.no_backup)
+        success = process_file(args.input, args.output, backup=args.backup)
         sys.exit(0 if success else 1)
     elif input_path.is_dir():
         # Process directory
         success = process_directory(args.input, args.output,
                                   recursive=args.recursive,
-                                  backup=not args.no_backup)
+                                  backup=args.backup)
         sys.exit(0 if success else 1)
     else:
         print(f"Error: {args.input} is not a valid file or directory")

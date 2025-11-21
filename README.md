@@ -15,7 +15,7 @@ NovelTuner 是一个网络小说处理工具集，提供 EPUB 图片修复、繁
 - **繁体转简体**：将繁体中文文本转换为简体中文
 - **批量转换**：支持单个文件或批量目录处理
 - **递归处理**：支持递归处理子目录中的所有文本文件
-- **自动备份**：转换前自动创建备份文件（可禁用）
+- **可选备份**：可选择创建备份文件（使用 `-b` 参数）
 
 ### 📝 文本换行修复工具 (fix_line_breaks.py)
 - **智能合并**：自动检测并修复中文文本中的异常换行（一行以汉字结尾，下一行以汉字开始）
@@ -23,7 +23,7 @@ NovelTuner 是一个网络小说处理工具集，提供 EPUB 图片修复、繁
 - **标点符号识别**：正确处理句号、感叹号、问号等标点符号，避免错误合并
 - **批量处理**：支持单个文件或整个目录的批量处理
 - **递归处理**：支持递归处理子目录中的所有文本文件
-- **自动备份**：处理前自动创建备份文件（可禁用）
+- **可选备份**：可选择创建备份文件（使用 `-b` 参数）
 
 ## 🚀 快速开始
 
@@ -41,81 +41,52 @@ pip install -r requirements.txt
 
 ## 📋 使用说明
 
-### EPUB 图片修复工具
+所有工具都遵循统一的参数标准：
 
-#### 基本用法
 ```bash
-# 处理单个 EPUB 文件
-python image_fixer.py input.epub
+# 基本使用（处理单个文件，不创建备份）
+python script.py input.file
 
-# 处理并保存到指定文件
-python image_fixer.py input.epub -o output.epub
+# 指定输出文件
+python script.py input.file -o output.file
 
-# 处理目录中的所有 EPUB 文件
-python image_fixer.py input_dir/
+# 递归处理目录
+python script.py input_dir/ -r
 
-# 递归处理子目录
-python image_fixer.py input_dir/ -r
+# 输出到指定目录
+python script.py input_dir/ -o output_dir/
 
-# 处理到指定输出目录
-python image_fixer.py input_dir/ -o output_dir/
+# 创建备份
+python script.py input.file -b
 ```
 
-#### 查看帮助
+### 工具特定用法
+
+#### EPUB 图片修复工具
+```bash
+# 处理 EPUB 文件
+python image_fixer.py input.epub
+python image_fixer.py input_dir/ -r -b
+```
+
+#### 繁简转换工具
+```bash
+# 转换文本文件
+python traditional_to_simplified.py input.txt
+python traditional_to_simplified.py input_dir/ -r -o output_dir/
+```
+
+#### 文本换行修复工具
+```bash
+# 修复文本换行
+python fix_line_breaks.py input.txt
+python fix_line_breaks.py input_dir/ -r -f txt,md
+```
+
+### 查看帮助
 ```bash
 python image_fixer.py --help
-```
-
-### 繁简转换工具
-
-#### 基本用法
-```bash
-# 转换单个文件（覆盖原文件，自动备份）
-python traditional_to_simplified.py input.txt
-
-# 转换到指定输出文件
-python traditional_to_simplified.py input.txt -o output.txt
-
-# 递归处理目录中的所有 txt 文件
-python traditional_to_simplified.py input_dir/ -r
-
-# 处理到指定输出目录
-python traditional_to_simplified.py input_dir/ -o output_dir/
-
-# 不创建备份文件
-python traditional_to_simplified.py input.txt --no-backup
-```
-
-#### 查看帮助
-```bash
 python traditional_to_simplified.py --help
-```
-
-### 文本换行修复工具
-
-#### 基本用法
-```bash
-# 修复单个文件（覆盖原文件，自动备份）
-python fix_line_breaks.py input.txt
-
-# 修复到指定输出文件
-python fix_line_breaks.py input.txt -o output.txt
-
-# 递归处理目录中的所有 txt 文件
-python fix_line_breaks.py input_dir/ -r
-
-# 处理到指定输出目录
-python fix_line_breaks.py input_dir/ -o output_dir/
-
-# 不创建备份文件
-python fix_line_breaks.py input.txt -b
-
-# 只处理特定扩展名的文件
-python fix_line_breaks.py input_dir/ -f txt,md
-```
-
-#### 查看帮助
-```bash
 python fix_line_breaks.py --help
 ```
 
@@ -171,7 +142,7 @@ NovelTuner/
 
 ## ⚠️ 注意事项
 
-1. **文件备份**：所有工具默认都会创建备份文件，如需覆盖原文件请使用 `--no-backup` 参数（各工具参数可能不同）
+1. **文件备份**：默认不创建备份文件，如需备份请使用 `-b` 参数
 2. **网络连接**：EPUB 图片修复需要网络连接以下载图片
 3. **文件权限**：确保有足够的文件读写权限
 4. **临时文件**：处理过程中会创建临时文件，程序会自动清理

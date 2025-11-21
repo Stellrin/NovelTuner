@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-文本换行修复脚本
-功能：
-1. 修复不正常换行（一行以汉字结尾，下一行以汉字开始）
-2. 支持批量处理多个文件
-3. 支持递归处理目录
-4. 支持备份原文件
+Text Line Break Fixer
+Features:
+1. Fix abnormal line breaks (line ending with Chinese character, next line starting with Chinese character)
+2. Support batch processing of multiple files
+3. Support recursive directory processing
+4. Support backup of original files
 """
 
 import sys
@@ -16,11 +16,11 @@ import argparse
 from pathlib import Path
 
 def is_chinese_char(char):
-    """判断字符是否为汉字"""
+    """Check if character is Chinese"""
     return '\u4e00' <= char <= '\u9fff'
 
 def fix_abnormal_line_breaks(text):
-    """修复不正常的换行"""
+    """Fix abnormal line breaks"""
     lines = text.split('\n')
     fixed_lines = []
 
@@ -70,7 +70,7 @@ def fix_abnormal_line_breaks(text):
     return '\n'.join(fixed_lines)
 
 def get_text_files(directory, recursive=False):
-    """获取文本文件列表"""
+    """Get list of text files"""
     text_extensions = {'.txt', '.md', '.log'}
     files = []
 
@@ -86,26 +86,26 @@ def get_text_files(directory, recursive=False):
 
     return files
 
-def process_file(input_file, output_file=None, backup=True, preview=False):
-    """处理单个文件"""
+def process_file(input_file, output_file=None, backup=False):
+    """Process single file"""
     try:
-        # 读取输入文件
+        # Read input file
         with open(input_file, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # 修复换行
+        # Fix line breaks
         fixed_content = fix_abnormal_line_breaks(content)
 
-        # 如果没有变化，直接返回
+        # If no changes, return directly
         if content == fixed_content:
             print(f"No fix needed: {input_file}")
             return True
 
-        # 写入输出文件
+        # Write output file
         if output_file is None:
             output_file = input_file
 
-        # 备份原文件
+        # Backup original file
         if backup:
             backup_file = input_file + '.bak'
             shutil.copy2(input_file, backup_file)
@@ -125,7 +125,7 @@ def process_file(input_file, output_file=None, backup=True, preview=False):
         return False
 
 def main():
-    """主函数"""
+    """Main function"""
     parser = argparse.ArgumentParser(
         description='Fix abnormal line breaks in Chinese text files',
         epilog="""
@@ -134,7 +134,7 @@ Examples:
   %(prog)s folder/                     # Fix all text files in folder
   %(prog)s folder/ -r                  # Recursive processing
   %(prog)s file.txt -o fixed.txt       # Output to different file
-  %(prog)s file.txt -b                 # No backup (use with caution)
+  %(prog)s file.txt -b                 # Create backup
   %(prog)s folder/ -f txt,md           # Only process .txt and .md files
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -144,27 +144,27 @@ Examples:
     parser.add_argument('-o', '--output', help='Output file or directory (optional)')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='Process subdirectories recursively')
-    parser.add_argument('-b', '--no-backup', action='store_true',
-                        help='Do not create backup files (use with caution)')
+    parser.add_argument('-b', '--backup', action='store_true',
+                        help='Create backup files (use with caution)')
     parser.add_argument('-f', '--filter', default='txt,md,log',
                         help='File extensions to process (default: txt,md,log)')
 
     args = parser.parse_args()
 
-    # 检查输入路径
+    # Check input path
     input_path = Path(args.input)
     if not input_path.exists():
         print(f"Error: Path does not exist: {args.input}")
         sys.exit(1)
 
-    # 获取要处理的文件列表
+    # Get list of files to process
     files_to_process = []
 
     if input_path.is_file():
-        # 处理单个文件
+        # Process single file
         files_to_process = [str(input_path)]
     else:
-        # 处理目录
+        # Process directory
         extensions = args.filter.split(',')
         text_extensions = {f'.{ext.strip()}' for ext in extensions}
 
@@ -184,14 +184,14 @@ Examples:
 
     print(f"Found {len(files_to_process)} files to process")
 
-    # 处理文件
+    # Process files
     success_count = 0
 
     for file_path in files_to_process:
-        if process_file(file_path, None, not args.no_backup, False):
+        if process_file(file_path, None, args.backup):
             success_count += 1
 
-    # 显示总结
+    # Show summary
     print(f"Processing complete: {success_count}/{len(files_to_process)} files successful")
 
 if __name__ == "__main__":

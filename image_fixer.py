@@ -161,7 +161,7 @@ def rebuild_epub(temp_dir, output_epub_file):
         return False
 
 
-def process_single_epub(epub_file, output_file=None, temp_dir="temp_epub"):
+def process_single_epub(epub_file, output_file=None, temp_dir="temp_epub", backup=False):
     """Process a single EPUB file"""
     epub_path = Path(epub_file)
 
@@ -226,6 +226,15 @@ def process_single_epub(epub_file, output_file=None, temp_dir="temp_epub"):
         else:
             output_path = Path(output_file)
 
+        # Create backup if requested and overwriting original
+        if backup and output_path == epub_path:
+            backup_path = epub_path.with_suffix(epub_path.suffix + '.backup')
+            try:
+                shutil.copy2(epub_path, backup_path)
+                print(f"Backup created: {backup_path}")
+            except Exception as e:
+                print(f"Warning: Failed to create backup file - {e}")
+
         # Rebuild EPUB
         if rebuild_epub(temp_dir, str(output_path)):
             print(f"Successfully created fixed EPUB: {output_path}")
@@ -261,7 +270,7 @@ def find_epub_files(input_path, recursive=False):
     return []
 
 
-def process_epub_files(input_path, output_path=None, recursive=False):
+def process_epub_files(input_path, output_path=None, recursive=False, backup=False):
     """Process EPUB files with batch support"""
     epub_files = find_epub_files(input_path, recursive)
 
@@ -287,7 +296,7 @@ def process_epub_files(input_path, output_path=None, recursive=False):
             # Auto-generate output filename
             output_file = None
 
-        if process_single_epub(str(epub_file), str(output_file) if output_file else None):
+        if process_single_epub(str(epub_file), str(output_file) if output_file else None, backup=backup):
             success_count += 1
 
     print(f"\nProcessing completed: Successfully processed {success_count}/{len(epub_files)} EPUB files")
@@ -306,6 +315,7 @@ Examples:
   %(prog)s input_dir/                           # Process all EPUB files in directory
   %(prog)s input_dir/ -r                        # Recursively process EPUB files
   %(prog)s input_dir/ -o output_dir/            # Process and save to output directory
+  %(prog)s input.epub -b                        # Process with backup
         """
     )
 
@@ -313,6 +323,8 @@ Examples:
     parser.add_argument('-o', '--output', help='Output file or directory path')
     parser.add_argument('-r', '--recursive', action='store_true',
                        help='Recursively process subdirectories')
+    parser.add_argument('-b', '--backup', action='store_true',
+                       help='Create backup files (valid for file overwrite mode only)')
     parser.add_argument('--version', action='version', version='%(prog)s 2.0')
 
     args = parser.parse_args()
@@ -323,7 +335,7 @@ Examples:
         print(f"Error: {args.input} does not exist")
         sys.exit(1)
 
-    success = process_epub_files(args.input, args.output, args.recursive)
+    success = process_epub_files(args.input, args.output, args.recursive, args.backup)
     sys.exit(0 if success else 1)
 
 
