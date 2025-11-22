@@ -7,3 +7,4 @@
 *.bak
 /.claude
 CLAUDE.md
+__pycache__/

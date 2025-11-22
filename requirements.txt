@@ -1,5 +1,6 @@
-requests
-beautifulsoup4
-pillow
-opencc-python-reimplemented
-chardet
+requests>=2.25.0
+beautifulsoup4>=4.9.0
+pillow>=8.0.0
+opencc-python-reimplemented>=0.1.0
+chardet>=4.0.0
+tqdm>=4.60.0
